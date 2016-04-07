@@ -10,7 +10,63 @@
     <atom:link href="http://suzumi.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>blue</title>
+      <title>株式会社adcee</title>
+      <link>http://suzumi.github.io/post/adcee/</link>
+      <pubDate>Tue, 05 Apr 2016 14:53:49 +0900</pubDate>
+      
+      <guid>http://suzumi.github.io/post/adcee/</guid>
+      <description>
+
+&lt;h2 id=&#34;職務内容:6e3f564c97c2efb231fe776212c301ea&#34;&gt;職務内容&lt;/h2&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&#34;vb-netを使用した社員管理システム:6e3f564c97c2efb231fe776212c301ea&#34;&gt;VB.netを使用した社員管理システム&lt;/h3&gt;
+
+&lt;h5 id=&#34;メンバー:6e3f564c97c2efb231fe776212c301ea&#34;&gt;メンバー&lt;/h5&gt;
+
+&lt;p&gt;2人&lt;/p&gt;
+
+&lt;h5 id=&#34;ポジション:6e3f564c97c2efb231fe776212c301ea&#34;&gt;ポジション&lt;/h5&gt;
+
+&lt;p&gt;エンジニア&lt;/p&gt;
+
+&lt;h5 id=&#34;開発環境:6e3f564c97c2efb231fe776212c301ea&#34;&gt;開発環境&lt;/h5&gt;
+
+&lt;p&gt;VB.net
+windows server 2008R2&lt;/p&gt;
+
+&lt;h5 id=&#34;内容:6e3f564c97c2efb231fe776212c301ea&#34;&gt;内容&lt;/h5&gt;
+
+&lt;p&gt;画面作成とロジックの実装&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&#34;アロマエステ求人サイトのマスター管理画面開発:6e3f564c97c2efb231fe776212c301ea&#34;&gt;アロマエステ求人サイトのマスター管理画面開発&lt;/h3&gt;
+
+&lt;h5 id=&#34;メンバー-1:6e3f564c97c2efb231fe776212c301ea&#34;&gt;メンバー&lt;/h5&gt;
+
+&lt;p&gt;3人&lt;/p&gt;
+
+&lt;h5 id=&#34;ポジション-1:6e3f564c97c2efb231fe776212c301ea&#34;&gt;ポジション&lt;/h5&gt;
+
+&lt;p&gt;エンジニア&lt;/p&gt;
+
+&lt;h5 id=&#34;開発環境-1:6e3f564c97c2efb231fe776212c301ea&#34;&gt;開発環境&lt;/h5&gt;
+
+&lt;p&gt;PHP
+smarty
+MySQL&lt;/p&gt;
+
+&lt;h5 id=&#34;内容-1:6e3f564c97c2efb231fe776212c301ea&#34;&gt;内容&lt;/h5&gt;
+
+&lt;p&gt;主にアロマエステ求人ポータルサイトの管理画面の実装。
+フロントエンドとバックエンドの実装を担当。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>株式会社blue</title>
       <link>http://suzumi.github.io/post/blue/</link>
       <pubDate>Tue, 05 Apr 2016 14:53:49 +0900</pubDate>
       
@@ -29,7 +85,7 @@
 
 &lt;h5 id=&#34;ポジション:5fd0355348c45d832cf05a9aa0baf084&#34;&gt;ポジション&lt;/h5&gt;
 
-&lt;p&gt;テスト&lt;/p&gt;
+&lt;p&gt;テスト設計&lt;/p&gt;
 
 &lt;h5 id=&#34;開発環境:5fd0355348c45d832cf05a9aa0baf084&#34;&gt;開発環境&lt;/h5&gt;
 
@@ -178,7 +234,7 @@ DBライブラリはSlick3を使用。&lt;/p&gt;
     </item>
     
     <item>
-      <title>gizumo</title>
+      <title>株式会社gizumo</title>
       <link>http://suzumi.github.io/post/gizumo/</link>
       <pubDate>Tue, 05 Apr 2016 14:53:49 +0900</pubDate>
       
@@ -211,62 +267,6 @@ Jenkins&lt;/p&gt;
 
 &lt;p&gt;共通基盤チームにて、フロントエンドからインフラまで幅広く対応。
 フロントエンドはknockout、APIサーバーではScala/Play2を利用していました。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>株式会社adcee</title>
-      <link>http://suzumi.github.io/post/adcee/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>http://suzumi.github.io/post/adcee/</guid>
-      <description>
-
-&lt;h2 id=&#34;職務内容:6e3f564c97c2efb231fe776212c301ea&#34;&gt;職務内容&lt;/h2&gt;
-
-&lt;hr /&gt;
-
-&lt;h3 id=&#34;vb-netを使用した社員管理システム:6e3f564c97c2efb231fe776212c301ea&#34;&gt;VB.netを使用した社員管理システム&lt;/h3&gt;
-
-&lt;h5 id=&#34;メンバー:6e3f564c97c2efb231fe776212c301ea&#34;&gt;メンバー&lt;/h5&gt;
-
-&lt;p&gt;2人&lt;/p&gt;
-
-&lt;h5 id=&#34;ポジション:6e3f564c97c2efb231fe776212c301ea&#34;&gt;ポジション&lt;/h5&gt;
-
-&lt;p&gt;エンジニア&lt;/p&gt;
-
-&lt;h5 id=&#34;開発環境:6e3f564c97c2efb231fe776212c301ea&#34;&gt;開発環境&lt;/h5&gt;
-
-&lt;p&gt;VB.net
-windows server 2008R2&lt;/p&gt;
-
-&lt;h5 id=&#34;内容:6e3f564c97c2efb231fe776212c301ea&#34;&gt;内容&lt;/h5&gt;
-
-&lt;p&gt;画面作成とロジックの実装&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h3 id=&#34;アロマエステ求人サイトのマスター管理画面開発:6e3f564c97c2efb231fe776212c301ea&#34;&gt;アロマエステ求人サイトのマスター管理画面開発&lt;/h3&gt;
-
-&lt;h5 id=&#34;メンバー-1:6e3f564c97c2efb231fe776212c301ea&#34;&gt;メンバー&lt;/h5&gt;
-
-&lt;p&gt;3人&lt;/p&gt;
-
-&lt;h5 id=&#34;ポジション-1:6e3f564c97c2efb231fe776212c301ea&#34;&gt;ポジション&lt;/h5&gt;
-
-&lt;p&gt;エンジニア&lt;/p&gt;
-
-&lt;h5 id=&#34;開発環境-1:6e3f564c97c2efb231fe776212c301ea&#34;&gt;開発環境&lt;/h5&gt;
-
-&lt;p&gt;PHP
-smarty
-MySQL&lt;/p&gt;
-
-&lt;h5 id=&#34;内容-1:6e3f564c97c2efb231fe776212c301ea&#34;&gt;内容&lt;/h5&gt;
-
-&lt;p&gt;主にアロマエステ求人ポータルサイトの管理画面の実装。
-フロントエンドとバックエンドの実装を担当。&lt;/p&gt;
 </description>
     </item>
     
