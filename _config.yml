@@ -69,7 +69,11 @@ theme: tranquilpeak
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type:
+  type: git
+  repo: git@github.com:suzumi/suzumi.github.io.git
+  branch: master
+  message: "Updated: {{ now('YYYY-MM-DD HH:mm:ss') }}"
+
 
 #RSS feed
 feed:
