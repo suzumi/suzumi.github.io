@@ -1,0 +1,499 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="fine later, feeling">
+    <title>docker composeでGoの開発環境を構築する - fine later, feeling</title>
+    <meta name="author" content="suzumi49n">
+    
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <meta name="description" content="この記事はTokyoSWアドベントカレンダー６日目の記事です。業務では開発環境にDockerを使っていますが（といってもMySQLコンテナを立ててるだけ）、一から自分で設定したことはないので勉強のため導入してみようと思います。">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="docker composeでGoの開発環境を構築する">
+<meta property="og:url" content="https://suzumi.github.io/2016/12/06/docker-go/index.html">
+<meta property="og:site_name" content="fine later, feeling">
+<meta property="og:description" content="この記事はTokyoSWアドベントカレンダー６日目の記事です。業務では開発環境にDockerを使っていますが（といってもMySQLコンテナを立ててるだけ）、一から自分で設定したことはないので勉強のため導入してみようと思います。">
+<meta property="og:updated_time" content="2017-04-04T10:14:50.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="docker composeでGoの開発環境を構築する">
+<meta name="twitter:description" content="この記事はTokyoSWアドベントカレンダー６日目の記事です。業務では開発環境にDockerを使っていますが（といってもMySQLコンテナを立ててるだけ）、一から自分で設定したことはないので勉強のため導入してみようと思います。">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://suzumi.github.io/assets/images/dombo.jpg"/>
+    
+    
+        <meta property="og:image" content="https://suzumi.github.io/2016/12/06/docker-go/docker.png"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://suzumi.github.io/2016/12/06/docker-go/docker.png" />
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-nuvue6sithwirecbhvw3dkaobiojqvtadsnhguwi7k04xklybw5djl1smadp.min.css">
+    <!--STYLES END-->
+    
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-76140234-1']);
+        _gaq.push(['_trackPageview']);
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="3">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <h1 class="header-title">
+        <a class="header-title-link" href="/ ">fine later, feeling</a>
+    </h1>
+    
+        
+            <a  class="header-right-picture "
+                href="#about">
+        
+        
+            <img class="header-picture" src="/assets/images/dombo.jpg"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="3">
+    
+        <div class="sidebar-profile">
+            <a href="/#about">
+                    <img class="sidebar-profile-picture" src="/assets/images/dombo.jpg"/>
+            </a>
+            <span class="sidebar-profile-name">suzumi49n</span>
+        </div>
+    
+    
+        <ul class="sidebar-buttons">
+        
+            <li class="sidebar-button">
+                
+                    <a  class="sidebar-button-link "
+                         href="/ "
+                        
+                    >
+                
+                    <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                    <span class="sidebar-button-desc">ホーム</span>
+                </a>
+        </li>
+        
+            <li class="sidebar-button">
+                
+                    <a  class="sidebar-button-link "
+                         href="/all-categories"
+                        
+                    >
+                
+                    <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                    <span class="sidebar-button-desc">カテゴリー</span>
+                </a>
+        </li>
+        
+            <li class="sidebar-button">
+                
+                    <a  class="sidebar-button-link "
+                         href="/all-tags"
+                        
+                    >
+                
+                    <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                    <span class="sidebar-button-desc">タグ</span>
+                </a>
+        </li>
+        
+            <li class="sidebar-button">
+                
+                    <a  class="sidebar-button-link "
+                         href="/all-archives"
+                        
+                    >
+                
+                    <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                    <span class="sidebar-button-desc">アーカイブ</span>
+                </a>
+        </li>
+        
+            <li class="sidebar-button">
+                
+                    <a  class="sidebar-button-link "
+                         href="#about"
+                        
+                    >
+                
+                    <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                    <span class="sidebar-button-desc">プロフィール</span>
+                </a>
+        </li>
+        
+    </ul>
+    
+        <ul class="sidebar-buttons">
+        
+            <li class="sidebar-button">
+                
+                    <a  class="sidebar-button-link " href="https://github.com/suzumi" target="_blank">
+                
+                    <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                    <span class="sidebar-button-desc">GitHub</span>
+                </a>
+        </li>
+        
+            <li class="sidebar-button">
+                
+                    <a  class="sidebar-button-link " href="https://twitter.com/suzumi49n" target="_blank">
+                
+                    <i class="sidebar-button-icon fa fa-lg fa-twitter"></i>
+                    <span class="sidebar-button-desc">Twitter</span>
+                </a>
+        </li>
+        
+            <li class="sidebar-button">
+                
+                    <a  class="sidebar-button-link " href="https://jp.linkedin.com/in/kazuaki-shibue-34958aa2" target="_blank">
+                
+                    <i class="sidebar-button-icon fa fa-lg fa-linkedin"></i>
+                    <span class="sidebar-button-desc">LinkedIn</span>
+                </a>
+        </li>
+        
+            <li class="sidebar-button">
+                
+                    <a  class="sidebar-button-link " href="mailto:kz.123.sb@gmail.com" target="_blank">
+                
+                    <i class="sidebar-button-icon fa fa-lg fa-envelope-o"></i>
+                    <span class="sidebar-button-desc">メール</span>
+                </a>
+        </li>
+        
+    </ul>
+    
+        <ul class="sidebar-buttons">
+        
+            <li class="sidebar-button">
+                
+                    <a  class="sidebar-button-link "
+                         href="/atom.xml"
+                        
+                    >
+                
+                    <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+                    <span class="sidebar-button-desc">RSS</span>
+                </a>
+        </li>
+        
+    </ul>
+    
+</nav>
+
+            
+            <div id="main" data-behavior="3"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title" itemprop="headline">
+            docker composeでGoの開発環境を構築する
+        </h1>
+    
+    <div class="post-meta">
+    <time itemprop="datePublished" datetime="2016-12-06T05:39:12+09:00">
+	
+		    2016/12/06
+    	
+    </time>
+    
+</div>
+
+</div>
+    
+    <div class="post-content markdown" itemprop="articleBody">
+        <div class="main-content-wrap">
+            <p>この記事は<a href="http://qiita.com/advent-calendar/2016/tokyosw" target="_blank" rel="external">TokyoSWアドベントカレンダー</a>６日目の記事です。<br>業務では開発環境にDockerを使っていますが（といってもMySQLコンテナを立ててるだけ）、一から自分で設定したことはないので勉強のため導入してみようと思います。</p>
+<a id="more"></a>
+<h2 id="docker-for-macを入れる"><a href="#docker-for-macを入れる" class="headerlink" title="docker for macを入れる"></a>docker for macを入れる</h2><p>開発環境はMacを想定してます。<br>少し前までならVirtualBox上にLinuxを乗せて更にそこにDockerを入れてコンテナを乗せて…というふうにやってましたが、その時代は終わりました。</p>
+<p>今はMac/Win向けに公式が出してくれているのでそれを使います。<br>これでVirtualBoxともオサラバです。</p>
+<p>docker for macを入れるとメニューバーにdockerちゃんのアイコンが表示され、<br><code>docker</code>/<code>docker-machine</code>/<code>docker-compose</code>のコマンドが使えるようになります。</p>
+<p>今回は主に<code>docker-compose</code>を使用して環境を構築します。</p>
+<p><code>docker-compose</code>とは複数のコンテナを同時に立ち上げ、さらに連携もできる便利なオーケストレーションツールです。<br>今回はアプリ用とデータストア用のコンテナを立ち上げるので非常に有用です。</p>
+<h2 id="アプリコンテナとデータストアコンテナの設定"><a href="#アプリコンテナとデータストアコンテナの設定" class="headerlink" title="アプリコンテナとデータストアコンテナの設定"></a>アプリコンテナとデータストアコンテナの設定</h2><p>普段業務ではScalaを使って仕事をしていますが、今回は趣味で開発しているGolang製のナレッジ共有ツールの開発環境をDocker化させようと思います。</p>
+<p><a href="https://github.com/SnippetsBucket/snicket" target="_blank" rel="external">snicket</a></p>
+<p>ちなみにgoのhttpフレームワークである<a href="https://github.com/labstack/echo" target="_blank" rel="external">echo</a>を使っています。</p>
+<p>アプリとデータストアを別々のコンテナとして立てます。<br>まずアプリ用コンテナを作るために以下の内容のDockerfileを作ります。<br><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">FROM</span> golang:<span class="number">1.7</span></div><div class="line"><span class="keyword">EXPOSE</span> <span class="number">5000</span></div></pre></td></tr></table></figure></p>
+<p><code>.docker</code>ディレクトリを作成し、その下にDockerfileを置くようにしてみました。<br>これは好みがあると思いますが…<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># プロジェクトルート</span></div><div class="line">.docker</div><div class="line">└── web</div><div class="line">    └── Dockerfile</div></pre></td></tr></table></figure></p>
+<p>docker-composeは<code>docker-compose.yml</code>というファイルで設定するので、プロジェクト直下にこれを置きます。<br>ファイルは以下のように設定しました。</p>
+<figure class="highlight yaml"><figcaption><span>docker-compose.yml</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="attr">version:</span> <span class="string">'2'</span></div><div class="line"></div><div class="line"><span class="attr">services:</span></div><div class="line"><span class="attr">  app:</span></div><div class="line"><span class="attr">    build:</span> .docker/web</div><div class="line"><span class="attr">    ports:</span></div><div class="line"><span class="bullet">      -</span> <span class="number">5000</span>:<span class="number">5000</span></div><div class="line"><span class="attr">    links:</span></div><div class="line"><span class="bullet">      -</span> mongo</div><div class="line"><span class="attr">    volumes:</span></div><div class="line"><span class="bullet">      -</span> .:/go/src/github.com/SnippetsBucket/snicket</div><div class="line"><span class="attr">    command:</span> bash -c <span class="string">'cd /go/src/github.com/SnippetsBucket/snicket/ &amp;&amp; go run server.go'</span></div><div class="line"><span class="attr">    container_name:</span> snicket-web</div><div class="line"></div><div class="line"><span class="attr">  mongo:</span></div><div class="line"><span class="attr">    image:</span> mongo:<span class="number">3.4</span><span class="number">.0</span></div><div class="line"><span class="attr">    ports:</span></div><div class="line"><span class="bullet">    -</span> <span class="number">27017</span>:<span class="number">27017</span></div><div class="line"><span class="attr">    volumes:</span></div><div class="line"><span class="attr">    - mongo-data:</span>/data/db</div><div class="line"><span class="attr">    container_name:</span> snicket-mongo</div><div class="line"></div><div class="line"><span class="attr">volumes:</span></div><div class="line"><span class="attr">  mongo-data:</span></div><div class="line"><span class="attr">    driver:</span> local</div></pre></td></tr></table></figure>
+<p><code>app</code>と<code>mongo</code>の2つのコンテナを定義しています。<br><code>app</code>は先程作ったDockerfileをビルドに使い、5000番ポートを開放し、mongoコンテナに繋ぐようにしています。<br>volumesでプロジェクトルートをコンテナにマウントし、コンテナ起動時にアプリをビルドしています。</p>
+<p>※GOPATHについて<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">ホスト側と同じようにコンテナ内も同じようなディレクトリ構成にする必要があります。</div><div class="line">Dockerfileで指定している公式イメージには既に/goが<span class="variable">$GOPATH</span>に設定されています。</div><div class="line"></div><div class="line">ホスト側:<span class="variable">$GOPATH</span>/src/github.com/SnippetsBucket/snicket</div><div class="line">コンテナ:<span class="variable">$GOPATH</span>/src/github.com/SnippetsBucket/snicket</div></pre></td></tr></table></figure></p>
+<p><code>mongo</code>のvolumesは、通常はコンテナを再起動させた場合、コンテナ内のデータは消えてしまうためデータを永続化させるためにマウントさせています。</p>
+<p>この時点でディレクトリ構成はこんな感じになりました。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">.docker</div><div class="line">└── web</div><div class="line">│   └── Dockerfile</div><div class="line">(中略)</div><div class="line">└── docker-compose.yml</div></pre></td></tr></table></figure>
+<p>これで準備が整ったので<code>docker-compose up</code>をしてみます。<br>するとイメージのDLが行われ、ビルドされます。<br>おそらくmongoのコンソールがずらずらと表示されると思います。</p>
+<p>別タブで<code>docker-compose ps</code>をしてみます。<br>コンテナ一覧の状態を見ることができます。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">    Name                   Command               State                Ports</div><div class="line">-----------------------------------------------------------------------------------------</div><div class="line">snicket-mongo   /entrypoint.sh mongod            Up      0.0.0.0:27017-&gt;27017/tcp</div><div class="line">snicket-web     bash -c <span class="built_in">cd</span> /go/src/github. ...   Up      0.0.0.0:5000-&gt;5000/tcp, 8888/tcp</div></pre></td></tr></table></figure>
+<p>そして最後に<code>localhost:5000</code>にブラウザからアクセスすると画面が表示されました。</p>
+<p>もちろん5000番ポートを開けているのでアプリ側でも5000番をリッスンするようにしておく必要があります。</p>
+<figure class="highlight go"><figcaption><span>server.go</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</div><div class="line">	router := router.Init()</div><div class="line">	router.Run(standard.New(<span class="string">":5000"</span>))</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>なんらかの理由でコンテナ内に入りたいときは<code>docker-compose exec &lt;サービス名&gt; bash</code>で入ることができます。<br><code>&lt;サービス名&gt;</code>とはdocker-compose.ymlに書いたサービス名たちのことです。</p>
+<p>最初<code>container_name</code>の名前を指定してハマってました…。</p>
+<ul>
+<li><p>コードの変更は次のようにコンテナを再起動すればOKです。<br><code>docker-compose restart app</code></p>
+</li>
+<li><p>mongoにつなぎたいときは普通に<code>mongo</code>と打てば繋げます。</p>
+</li>
+</ul>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>これでgolangの快適な開発環境ができました。</p>
+<p>virtualboxを起動していない分、起動も速いですし余計なメモリも食いません。</p>
+<p>docker-composeのお陰でdockerが簡単に扱えていいですね。</p>
+<p>ぜひこれを機にdocker入門してみませんか？</p>
+
+            
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">タグ</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/docker/">docker</a> <a class="tag tag--primary tag--small t-link" href="/tags/golang/">golang</a>
+
+            </div>
+        
+        <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/01/04/new-2017/"  data-tooltip="2017年意気込み">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">前</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">次</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
+                <i class="fa fa-share-alt"></i>
+            </a>
+        </li>
+        <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://suzumi.github.io/2016/12/06/docker-go/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://suzumi.github.io/2016/12/06/docker-go/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://suzumi.github.io/2016/12/06/docker-go/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#">
+            
+                <i class="fa fa-list"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2017 suzumi49n. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="3">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/01/04/new-2017/"  data-tooltip="2017年意気込み">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">前</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">次</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
+                <i class="fa fa-share-alt"></i>
+            </a>
+        </li>
+        <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://suzumi.github.io/2016/12/06/docker-go/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://suzumi.github.io/2016/12/06/docker-go/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://suzumi.github.io/2016/12/06/docker-go/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#">
+            
+                <i class="fa fa-list"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="3">
+    <ul class="share-options">
+        <li class="share-option">
+            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://suzumi.github.io/2016/12/06/docker-go/">
+                <i class="fa fa-google-plus"></i><span class="">Google Plusで共有</span>
+            </a>
+        </li>
+        <li class="share-option">
+            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://suzumi.github.io/2016/12/06/docker-go/">
+                <i class="fa fa-facebook-official"></i><span>Facebookで共有</span>
+            </a>
+        </li>
+        <li class="share-option">
+            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://suzumi.github.io/2016/12/06/docker-go/">
+                <i class="fa fa-twitter"></i><span>Twitterで共有</span>
+            </a>
+        </li>
+    </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-remove"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/dombo.jpg"/>
+        
+            <h4 id="about-card-name">suzumi49n</h4>
+        
+            <h5 id="about-card-bio"><p>I’m web developer in Tokyo who love learning new things.</p>
+</h5>
+        
+        
+            <h5 id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>web developer</p>
+
+            </h5>
+        
+        
+            <h5 id="about-card-location">
+                <i class="fa fa-map-marker"></i>
+                <br/>
+                Tokyo
+            </h5>
+        
+    </div>
+</div>
+
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+    </body>
+    <!--SCRIPTS-->
+<script src="/assets/js/script-i4qo6jx6jji9fg0dftpya6ivemizsbow4fhow76d8dwpm7m1wbvi378ssumx.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+
+
+
+</html>

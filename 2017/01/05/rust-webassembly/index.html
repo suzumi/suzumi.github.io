@@ -1,0 +1,501 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="fine later, feeling">
+    <title>RustからWebAssemblyにコンパイルしてみる - fine later, feeling</title>
+    <meta name="author" content="suzumi49n">
+    
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+    
+    <meta name="description" content="Rust入門者です。WebAssembly(wasm)入門者です。今までNightlyではサポートされてたようですが、stableなv1.14でも試験的にWebAssemblyがサポートされたそうなので試してみます。">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="RustからWebAssemblyにコンパイルしてみる">
+<meta property="og:url" content="https://suzumi.github.io/2017/01/05/rust-webassembly/index.html">
+<meta property="og:site_name" content="fine later, feeling">
+<meta property="og:description" content="Rust入門者です。WebAssembly(wasm)入門者です。今までNightlyではサポートされてたようですが、stableなv1.14でも試験的にWebAssemblyがサポートされたそうなので試してみます。">
+<meta property="og:image" content="https://suzumi.github.io/emscripten.png">
+<meta property="og:updated_time" content="2017-04-04T10:14:50.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RustからWebAssemblyにコンパイルしてみる">
+<meta name="twitter:description" content="Rust入門者です。WebAssembly(wasm)入門者です。今までNightlyではサポートされてたようですが、stableなv1.14でも試験的にWebAssemblyがサポートされたそうなので試してみます。">
+<meta name="twitter:image" content="https://suzumi.github.io/emscripten.png">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://suzumi.github.io/assets/images/dombo.jpg"/>
+    
+    
+        <meta property="og:image" content="https://suzumi.github.io/2017/01/05/rust-webassembly/rust.png"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://suzumi.github.io/2017/01/05/rust-webassembly/rust.png" />
+    
+    
+    
+    <!--STYLES-->
+    <link rel="stylesheet" href="/assets/css/style-nuvue6sithwirecbhvw3dkaobiojqvtadsnhguwi7k04xklybw5djl1smadp.min.css">
+    <!--STYLES END-->
+    
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-76140234-1']);
+        _gaq.push(['_trackPageview']);
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+        
+            
+        
+    
+
+<header id="header" data-behavior="3">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <h1 class="header-title">
+        <a class="header-title-link" href="/ ">fine later, feeling</a>
+    </h1>
+    
+        
+            <a  class="header-right-picture "
+                href="#about">
+        
+        
+            <img class="header-picture" src="/assets/images/dombo.jpg"/>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="3">
+    
+        <div class="sidebar-profile">
+            <a href="/#about">
+                    <img class="sidebar-profile-picture" src="/assets/images/dombo.jpg"/>
+            </a>
+            <span class="sidebar-profile-name">suzumi49n</span>
+        </div>
+    
+    
+        <ul class="sidebar-buttons">
+        
+            <li class="sidebar-button">
+                
+                    <a  class="sidebar-button-link "
+                         href="/ "
+                        
+                    >
+                
+                    <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+                    <span class="sidebar-button-desc">ホーム</span>
+                </a>
+        </li>
+        
+            <li class="sidebar-button">
+                
+                    <a  class="sidebar-button-link "
+                         href="/all-categories"
+                        
+                    >
+                
+                    <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+                    <span class="sidebar-button-desc">カテゴリー</span>
+                </a>
+        </li>
+        
+            <li class="sidebar-button">
+                
+                    <a  class="sidebar-button-link "
+                         href="/all-tags"
+                        
+                    >
+                
+                    <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+                    <span class="sidebar-button-desc">タグ</span>
+                </a>
+        </li>
+        
+            <li class="sidebar-button">
+                
+                    <a  class="sidebar-button-link "
+                         href="/all-archives"
+                        
+                    >
+                
+                    <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+                    <span class="sidebar-button-desc">アーカイブ</span>
+                </a>
+        </li>
+        
+            <li class="sidebar-button">
+                
+                    <a  class="sidebar-button-link "
+                         href="#about"
+                        
+                    >
+                
+                    <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+                    <span class="sidebar-button-desc">プロフィール</span>
+                </a>
+        </li>
+        
+    </ul>
+    
+        <ul class="sidebar-buttons">
+        
+            <li class="sidebar-button">
+                
+                    <a  class="sidebar-button-link " href="https://github.com/suzumi" target="_blank">
+                
+                    <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+                    <span class="sidebar-button-desc">GitHub</span>
+                </a>
+        </li>
+        
+            <li class="sidebar-button">
+                
+                    <a  class="sidebar-button-link " href="https://twitter.com/suzumi49n" target="_blank">
+                
+                    <i class="sidebar-button-icon fa fa-lg fa-twitter"></i>
+                    <span class="sidebar-button-desc">Twitter</span>
+                </a>
+        </li>
+        
+            <li class="sidebar-button">
+                
+                    <a  class="sidebar-button-link " href="https://jp.linkedin.com/in/kazuaki-shibue-34958aa2" target="_blank">
+                
+                    <i class="sidebar-button-icon fa fa-lg fa-linkedin"></i>
+                    <span class="sidebar-button-desc">LinkedIn</span>
+                </a>
+        </li>
+        
+            <li class="sidebar-button">
+                
+                    <a  class="sidebar-button-link " href="mailto:kz.123.sb@gmail.com" target="_blank">
+                
+                    <i class="sidebar-button-icon fa fa-lg fa-envelope-o"></i>
+                    <span class="sidebar-button-desc">メール</span>
+                </a>
+        </li>
+        
+    </ul>
+    
+        <ul class="sidebar-buttons">
+        
+            <li class="sidebar-button">
+                
+                    <a  class="sidebar-button-link "
+                         href="/atom.xml"
+                        
+                    >
+                
+                    <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+                    <span class="sidebar-button-desc">RSS</span>
+                </a>
+        </li>
+        
+    </ul>
+    
+</nav>
+
+            
+            <div id="main" data-behavior="3"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post" itemscope itemType="http://schema.org/BlogPosting">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title" itemprop="headline">
+            RustからWebAssemblyにコンパイルしてみる
+        </h1>
+    
+    <div class="post-meta">
+    <time itemprop="datePublished" datetime="2017-01-05T05:46:24+09:00">
+	
+		    2017/01/05
+    	
+    </time>
+    
+</div>
+
+</div>
+    
+    <div class="post-content markdown" itemprop="articleBody">
+        <div class="main-content-wrap">
+            <p>Rust入門者です。WebAssembly(wasm)入門者です。<br>今までNightlyではサポートされてたようですが、stableなv1.14でも試験的にWebAssemblyがサポートされたそうなので試してみます。</p>
+<a id="more"></a>
+<h2 id="準備"><a href="#準備" class="headerlink" title="準備"></a>準備</h2><p>Rustを入れる必要があるので入れてない場合はrustupでインストールします。<br><br>既にrustupでRustをインストールしてるけどバージョンが古い場合は<code>rustup update</code>で最新版にできます。multirust使ってる人は知りません。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># バージョン確認</span></div><div class="line">$ rustc -V</div><div class="line">rustc 1.14.0 (e8a012324 2016-12-16)</div></pre></td></tr></table></figure>
+<p>新しいwasmにコンパイルするためのターゲットをインストールします。<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ rustup target add wasm32-unknown-emscripten</div></pre></td></tr></table></figure></p>
+<p>後述の処理でcmakeが必要なので先に入れておく<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ brew install cmake</div></pre></td></tr></table></figure></p>
+<p>Emscripten SDKをダウンロードして解凍します。（ポチポチでDLしたい場合は<a href="http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html#download-and-install" target="_blank" rel="external">こちら</a>）<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># DL＆解凍</span></div><div class="line">$ curl -O https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz</div><div class="line">$ tar zxvf emsdk-portable.tar.gz</div><div class="line"></div><div class="line"><span class="comment"># インストール</span></div><div class="line">$ <span class="built_in">cd</span> emsdk_portable/</div><div class="line">$ emsdk update</div><div class="line">$ emsdk install sdk-incoming-64bit</div><div class="line">$ emsdk activate sdk-incoming-64bit</div></pre></td></tr></table></figure></p>
+<p><code>emsdk install sdk-incoming-64bit</code>を中でCのビルドする工程があるんですが、これがかなり長いです。(40分かかりました)</p>
+<p>Emscriptenの環境変数を設定<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ <span class="built_in">source</span> ./emsdk_env.sh</div></pre></td></tr></table></figure></p>
+<p><code>emcc</code>のバージョンを確認します。<br><code>1.37.0</code>以上が必要です。<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ emcc -v</div><div class="line">emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 1.37.1</div><div class="line">（後略）</div></pre></td></tr></table></figure></p>
+<h2 id="WebAssemblyの生成と実行"><a href="#WebAssemblyの生成と実行" class="headerlink" title="WebAssemblyの生成と実行"></a>WebAssemblyの生成と実行</h2><p>hello.rsを作ります。<br><figure class="highlight rust"><figcaption><span>hello.rs</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">fn</span> <span class="title">main</span></span>() &#123;</div><div class="line">  <span class="built_in">println!</span>(<span class="string">"Hello world!!"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>以下のコマンドで最適化オプションをつけてビルドします。<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ rustc --target=wasm32-unknown-emscripten hello.rs -o hello.html</div></pre></td></tr></table></figure></p>
+<p>コマンドを叩いた後、2〜3分プロンプトが返って来なくてヒヤヒヤしましたが成功すると以下のファイルが生成されました。<br>いっぱい生成されたけど使ってるのは<code>hello.js</code>と<code>hello.wasm</code>だけかな？(asm.jsはオマケで生成されてるのだろうか…)</p>
+<ul>
+<li>hello.asm.js</li>
+<li>hello.html</li>
+<li>hello.js</li>
+<li>hello.rs # さっき作ったファイル</li>
+<li>hello.wasm</li>
+<li>hello.wast</li>
+</ul>
+<p>Chrome CanaryもしくはFirefox Nightlyで<code>chrome://flags/</code>にアクセスしてWebAssemblyを有効にします。<br>[f:id:suzumidokoro:20170105175622p:plain]</p>
+<p>pythonでもphpでもnodeでもいいですが、今回はpythonでサクッとWebサーバを立てます。<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ python -m SimpleHTTPServer</div></pre></td></tr></table></figure></p>
+<p><code>http://localhost:8000/hello.html</code>にアクセスするとコンソールに文字が出力されていると思います。</p>
+</div><div class="figure figure--fullWidth"><img class="figure-img" src="emscripten.png" alt="emscriptenのコンソールに表示されている"><span class="caption">emscriptenのコンソールに表示されている</span></div><div class="main-content-wrap">
+<p>ということで無事WebAssemblyをブラウザで動かすことができました。</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>整理するとこんな感じでしょうか。</p>
+<ul>
+<li>WebAssemblyは簡単に言うとブラウザでの実行を想定したバイナリフォーマット。</li>
+<li>EmscriptenはLLVMベースにC/C++をJSやasm.jsに変換するコンパイラ</li>
+<li>Rustコード→LLVM IRを生成する(RustのEmsctipten対応)</li>
+<li>Emscriptenからwasmの生成</li>
+<li>hello.html中の<code>&lt;script&gt;</code>内でwasmをロード、hello.jsの中でwasmをコンパイルして実行</li>
+</ul>
+<p>んーややこしい。</p>
+<p>ここらへん疎いんでよくわかってないですが、もう少し深掘りしていきたいと思います。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://medium.com/@chicoxyzzy/compiling-rust-to-webassembly-guide-411066a69fde#.ww7iitlup" target="_blank" rel="external">Compiling Rust to WebAssembly Guide – Hacker Noon</a></p>
+
+            
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">タグ</span><br/>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/rust/">rust</a> <a class="tag tag--primary tag--small t-link" href="/tags/webassembly/">webassembly</a>
+
+            </div>
+        
+        <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/04/04/english-1000/"  data-tooltip="オンライン英会話を始めて1000分経った">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">前</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/01/04/new-2017/" data-tooltip="2017年意気込み">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">次</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
+                <i class="fa fa-share-alt"></i>
+            </a>
+        </li>
+        <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://suzumi.github.io/2017/01/05/rust-webassembly/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://suzumi.github.io/2017/01/05/rust-webassembly/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://suzumi.github.io/2017/01/05/rust-webassembly/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#">
+            
+                <i class="fa fa-list"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2017 suzumi49n. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="3">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/04/04/english-1000/"  data-tooltip="オンライン英会話を始めて1000分経った">
+                
+                    <i class="fa fa-angle-left"></i>
+                    <span class="hide-xs hide-sm text-small icon-ml">前</span>
+                </a>
+            </li>
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--default tooltip--top" href="/2017/01/04/new-2017/" data-tooltip="2017年意気込み">
+                
+                    <span class="hide-xs hide-sm text-small icon-mr">次</span>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions"  href="#btn-open-shareoptions">
+                <i class="fa fa-share-alt"></i>
+            </a>
+        </li>
+        <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://suzumi.github.io/2017/01/05/rust-webassembly/">
+                <i class="fa fa-google-plus"></i>
+            </a>
+        </li>
+        <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://suzumi.github.io/2017/01/05/rust-webassembly/">
+                <i class="fa fa-facebook-official"></i>
+            </a>
+        </li>
+        <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=https://suzumi.github.io/2017/01/05/rust-webassembly/">
+                <i class="fa fa-twitter"></i>
+            </a>
+        </li>
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#">
+            
+                <i class="fa fa-list"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                <div id="share-options-bar" class="share-options-bar" data-behavior="3">
+    <ul class="share-options">
+        <li class="share-option">
+            <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://suzumi.github.io/2017/01/05/rust-webassembly/">
+                <i class="fa fa-google-plus"></i><span class="">Google Plusで共有</span>
+            </a>
+        </li>
+        <li class="share-option">
+            <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://suzumi.github.io/2017/01/05/rust-webassembly/">
+                <i class="fa fa-facebook-official"></i><span>Facebookで共有</span>
+            </a>
+        </li>
+        <li class="share-option">
+            <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https://suzumi.github.io/2017/01/05/rust-webassembly/">
+                <i class="fa fa-twitter"></i><span>Twitterで共有</span>
+            </a>
+        </li>
+    </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-remove"></i>
+        </div>
+        
+            <img id="about-card-picture" src="/assets/images/dombo.jpg"/>
+        
+            <h4 id="about-card-name">suzumi49n</h4>
+        
+            <h5 id="about-card-bio"><p>I’m web developer in Tokyo who love learning new things.</p>
+</h5>
+        
+        
+            <h5 id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>web developer</p>
+
+            </h5>
+        
+        
+            <h5 id="about-card-location">
+                <i class="fa fa-map-marker"></i>
+                <br/>
+                Tokyo
+            </h5>
+        
+    </div>
+</div>
+
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+    </body>
+    <!--SCRIPTS-->
+<script src="/assets/js/script-i4qo6jx6jji9fg0dftpya6ivemizsbow4fhow76d8dwpm7m1wbvi378ssumx.min.js"></script>
+<!--SCRIPTS END-->
+
+    
+
+
+
+</html>
